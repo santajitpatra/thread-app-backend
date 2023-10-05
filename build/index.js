@@ -13,47 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const server_1 = require("@apollo/server");
 const express4_1 = require("@apollo/server/express4");
-const db_1 = require("./lib/db");
+const graphql_1 = __importDefault(require("./graphql"));
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = (0, express_1.default)();
         const port = Number(process.env.PORT) || 8000;
         app.use(express_1.default.json());
-        // create graphql server
-        const server = new server_1.ApolloServer({
-            // Schema
-            typeDefs: `type Query{
-      hello: String
-      say(name:String): String
-    }
-    type Mutation {
-      createUser( firstName: String!, lastName: String!,email: String!, password: String! ): Boolean
-    }
-    `,
-            // function
-            resolvers: {
-                Query: {
-                    hello: () => `Hello there!`,
-                    say: (_, { name }) => `Hey ${name}, How are you!`,
-                },
-                Mutation: {
-                    createUser: (_, { firstName, lastName, email, password, }) => __awaiter(this, void 0, void 0, function* () {
-                        yield db_1.prisma.user.create({
-                            data: { firstName, lastName, email, password, salt: "my_salt" },
-                        });
-                        return true;
-                    }),
-                },
-            },
-        });
-        // start graphql server
-        yield server.start();
         app.get("/", (req, res) => {
             res.send("Hello World!");
         });
-        app.use("/graphql", (0, express4_1.expressMiddleware)(server));
+        app.use("/graphql", (0, express4_1.expressMiddleware)(yield (0, graphql_1.default)()));
         app.listen(port, () => {
             console.log(`Example app listening on port ${port}`);
         });
