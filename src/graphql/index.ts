@@ -1,10 +1,14 @@
 import { ApolloServer } from "@apollo/server";
 import { User } from "./user";
+
 async function createApolloGraphqlServer() {
   const gqlServer = new ApolloServer({
-    // Schema
-    typeDefs: `type Query{
-      ${User.queries}    }
+   
+    typeDefs: `
+    ${User.typeDefs}
+    type Query {
+      ${User.queries}
+    }
 
     type Mutation {
      ${User.mutations}
@@ -17,9 +21,22 @@ async function createApolloGraphqlServer() {
   });
 
   // start graphql server
-
   await gqlServer.start();
 
   return gqlServer;
 }
+
 export default createApolloGraphqlServer;
+
+
+
+
+
+
+
+
+
+
+  
+
+
